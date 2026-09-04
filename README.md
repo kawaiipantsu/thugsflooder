@@ -89,7 +89,10 @@ audit_log: /var/log/thugsflooder/audit.jsonl   # mandatory, can't be /dev/null
 ```
 
 See [`examples/targets.example.yaml`](examples/targets.example.yaml) and
-[`examples/recording.example.jsonl`](examples/recording.example.jsonl) for the full formats.
+[`examples/recording.example.jsonl`](examples/recording.example.jsonl) for the full formats, and
+[`payloads/`](payloads/) for a ready-to-replay library of 187 entries across 9 traffic flavors
+(HTTP, DNS, IRC, TCP banners, JSON APIs, and more) that runs as-is against the example allowlist
+above.
 
 ### Packages
 
