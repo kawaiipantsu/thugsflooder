@@ -1,0 +1,17 @@
+Package: thugsflooder
+Version: {{VERSION}}
+Section: net
+Priority: optional
+Architecture: {{ARCH}}
+Maintainer: THUGS(red) <contact@thugs.red>
+Homepage: https://thugs.red
+Description: Scoped network/log load-generation tool for red-team/blue-team exercises
+ thugsflooder generates sustained, high-volume synthetic network traffic
+ (UDP/TCP/HTTP junk and replayed traffic recordings) against an explicit,
+ user-supplied allowlist of hosts/ports/protocols, with a live terminal
+ dashboard (bandwidth graph, log pane, summary stats).
+ .
+ It will never send traffic to a target outside the allowlist, and it
+ always writes a permanent audit log of every attempt. It will not run
+ in any capacity without --i-understand-the-risk. Only use it against
+ networks and hosts you own or are explicitly authorized to test.

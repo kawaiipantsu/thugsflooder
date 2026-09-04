@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+cat <<'EOF'
+thugsflooder installed.
+
+This tool will not run in any capacity without --i-understand-the-risk.
+Only use it against networks and hosts you own or are explicitly
+authorized to test. Run 'thugsflooder --help' for details.
+EOF
+
+exit 0

@@ -1,0 +1,23 @@
+# thugsflooder allowlist config.
+#
+# Every target below must be explicitly authorized by whoever owns this
+# network/lab. thugsflooder refuses to send traffic to anything not
+# listed here — there is no "discover and flood everything" mode.
+targets:
+  - host: 10.0.0.5
+    ports: [53, 123, 8080]
+    protocols: [udp, tcp, http]
+  - host: 10.0.0.10
+    ports: [443]
+    protocols: [http]
+
+rate_limit:
+  # Global cap across all generators combined, in packets/requests per second.
+  max_pps: 2000
+  # Concurrent worker goroutines per target:port:protocol. Raise this to
+  # push more throughput against RTT-bound protocols (tcp/http) — a single
+  # worker is limited by one connection's round-trip time, not CPU.
+  workers_per_target: 8
+
+# Always written, cannot be disabled or pointed at /dev/null.
+audit_log: /var/log/thugsflooder/audit.jsonl
