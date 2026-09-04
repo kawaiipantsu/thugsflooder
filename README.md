@@ -41,6 +41,13 @@ generates its own synthetic noise; it is not a channel for injecting or disguisi
   <code>thugsflooder run --i-understand-the-risk --config targets.yaml</code>
 </p>
 
+<p align="center">
+  <img src="assets/screenshot.png" alt="thugsflooder live TUI dashboard" width="820">
+  <br>
+  <sub>The live dashboard mid-flood: bandwidth graph, log/status pane (here showing the allowlist
+  actually blocking an out-of-scope replay target), and running summary stats.</sub>
+</p>
+
 ## What's in the box
 
 | | |

@@ -25,6 +25,7 @@ func (m *Manager) httpWorker(ctx context.Context, host string, port int) {
 	url := "http://" + addr + "/thugsflooder-test/" + m.session
 	client := &http.Client{Timeout: httpTimeout}
 
+	var lastLogged string
 	for {
 		if ctx.Err() != nil {
 			return
@@ -35,6 +36,7 @@ func (m *Manager) httpWorker(ctx context.Context, host string, port int) {
 		if !m.allow.Allowed(host, port, config.ProtoHTTP) {
 			m.sinks.Stats.RecordBlocked()
 			m.sinks.Audit.Record(audit.Entry{Proto: "http", Host: host, Port: port, Result: audit.ResultBlocked})
+			logOnce(m.sinks, &lastLogged, "http %s: blocked (not in allowlist)", addr)
 			continue
 		}
 
@@ -51,9 +53,11 @@ func (m *Manager) httpWorker(ctx context.Context, host string, port int) {
 		if err != nil {
 			m.sinks.Stats.RecordDropped()
 			m.sinks.Audit.Record(audit.Entry{Proto: "http", Host: host, Port: port, Result: audit.ResultDropped, Detail: err.Error()})
+			logOnce(m.sinks, &lastLogged, "http %s: request error: %v", addr, err)
 			continue
 		}
 		resp.Body.Close()
+		lastLogged = ""
 
 		m.sinks.Stats.RecordSent("http", host, len(body))
 		m.sinks.Audit.Record(audit.Entry{Proto: "http", Host: host, Port: port, Bytes: len(body), Result: audit.ResultSent})

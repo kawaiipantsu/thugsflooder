@@ -95,6 +95,20 @@ func markedPayload(sessionID string, size int) []byte {
 	return buf
 }
 
+// logOnce logs the formatted message only if it differs from the last
+// message logged through lastLogged, so a sustained run of identical
+// failures (e.g. a target that's gone down) doesn't flood the log pane
+// with one line per send — the audit log still records every attempt
+// regardless.
+func logOnce(sinks *Sinks, lastLogged *string, format string, args ...any) {
+	msg := fmt.Sprintf(format, args...)
+	if msg == *lastLogged {
+		return
+	}
+	*lastLogged = msg
+	sinks.Log("%s", msg)
+}
+
 func newSessionID() string {
 	n, err := rand.Int(rand.Reader, big.NewInt(1<<62))
 	if err != nil {

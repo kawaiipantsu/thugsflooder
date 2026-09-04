@@ -20,6 +20,7 @@ const (
 // until ctx is cancelled.
 func (m *Manager) tcpWorker(ctx context.Context, host string, port int) {
 	addr := net.JoinHostPort(host, strconv.Itoa(port))
+	var lastLogged string
 	for {
 		if ctx.Err() != nil {
 			return
@@ -30,6 +31,7 @@ func (m *Manager) tcpWorker(ctx context.Context, host string, port int) {
 		if !m.allow.Allowed(host, port, config.ProtoTCP) {
 			m.sinks.Stats.RecordBlocked()
 			m.sinks.Audit.Record(audit.Entry{Proto: "tcp", Host: host, Port: port, Result: audit.ResultBlocked})
+			logOnce(m.sinks, &lastLogged, "tcp %s: blocked (not in allowlist)", addr)
 			continue
 		}
 
@@ -37,6 +39,7 @@ func (m *Manager) tcpWorker(ctx context.Context, host string, port int) {
 		if err != nil {
 			m.sinks.Stats.RecordDropped()
 			m.sinks.Audit.Record(audit.Entry{Proto: "tcp", Host: host, Port: port, Result: audit.ResultDropped, Detail: err.Error()})
+			logOnce(m.sinks, &lastLogged, "tcp %s: dial error: %v", addr, err)
 			continue
 		}
 
@@ -46,8 +49,10 @@ func (m *Manager) tcpWorker(ctx context.Context, host string, port int) {
 		if err != nil {
 			m.sinks.Stats.RecordDropped()
 			m.sinks.Audit.Record(audit.Entry{Proto: "tcp", Host: host, Port: port, Result: audit.ResultDropped, Detail: err.Error()})
+			logOnce(m.sinks, &lastLogged, "tcp %s: write error: %v", addr, err)
 			continue
 		}
+		lastLogged = ""
 		m.sinks.Stats.RecordSent("tcp", host, n)
 		m.sinks.Audit.Record(audit.Entry{Proto: "tcp", Host: host, Port: port, Bytes: n, Result: audit.ResultSent})
 	}
