@@ -1,6 +1,9 @@
 BINARY      := thugsflooder
 MODULE      := github.com/thugsred/thugsflooder
 VERSION     := $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.1.0)
+# Debian version numbers must start with a digit; strip a leading "v" from
+# tags like "v0.1.0" for the control file / package filenames only.
+DEB_VERSION := $(shell echo "$(VERSION)" | sed 's/^v//')
 DIST        := dist
 LDFLAGS     := -s -w -X $(MODULE)/internal/about.Version=$(VERSION)
 
@@ -41,7 +44,7 @@ deb: build
 		stage=$(DIST)/deb/$$debarch; \
 		rm -rf $$stage; \
 		mkdir -p $$stage/DEBIAN $$stage/usr/bin $$stage/usr/share/doc/$(BINARY); \
-		sed -e "s/{{VERSION}}/$(VERSION)/" -e "s/{{ARCH}}/$$debarch/" \
+		sed -e "s/{{VERSION}}/$(DEB_VERSION)/" -e "s/{{ARCH}}/$$debarch/" \
 			packaging/debian/control.tmpl > $$stage/DEBIAN/control; \
 		cp packaging/debian/postinst $$stage/DEBIAN/postinst; \
 		chmod 755 $$stage/DEBIAN/postinst; \
@@ -49,7 +52,7 @@ deb: build
 		chmod 755 $$stage/usr/bin/$(BINARY); \
 		cp LICENSE README.md $$stage/usr/share/doc/$(BINARY)/; \
 		echo "==> packaging $$debarch"; \
-		dpkg-deb --build --root-owner-group -Zxz $$stage $(DIST)/$(BINARY)_$(VERSION)_$$debarch.deb; \
+		dpkg-deb --build --root-owner-group -Zxz $$stage $(DIST)/$(BINARY)_$(DEB_VERSION)_$$debarch.deb; \
 	done
 
 clean:
